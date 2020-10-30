@@ -52,49 +52,50 @@ const sample = [
     { "id": 116676275, "playTime": 5833,    "auto": false }
 ]
 
-class Select {
-    constructor(dataSet, dataOptions) {
-        this.dataSet = dataSet;
-        this.options = dataOptions;
+const Select = (dataSet, options) => {
+    const keysSet = Object.keys(options);
+    let filterKey = 0;
+    let filteredData = [];
+
+    getFilteredDataSet(dataSet, filterKey);
+
+    function getFilteredDataSet(filteredDataSet, filterKey) {
+        if (filter < keysSet.length) {
+            console.log("keys: ", keysSet[filterKey]);
+
+            if(keysSet[filterKey] === "id") {
+                filteredData = getItemsById();
+            }
+            if(keysSet[filterKey] === "auto") {
+                filteredData = getItemsByAutoOption()
+            }
+            if(keysSet[filterKey] === "minPlayTime"){
+                filteredData = getItemsByMinPlayTime()
+            }
+            if(keysSet[filterKey] === "merge"){
+                filteredData = mergeItems()
+            }
+
+            console.log("filteredData: ", filteredData);
+            filterKey++;
+            getFilteredDataSet(filteredData, filterKey);
+        }
     }
 
-    #optionsManager() {
-        if(!this.dataSet) {
-            return;
-        }
-        if(this.options.id) {
-            this.getItemsById()
-        }
-        if(this.options.auto) {
-            this.getItemsByAutoOption()
-        }
-        if(this.options.minPlayTime){
-            this.getItemsByMinPlayTime()
-        }
-        if(this.options.merge){
-            this.mergeItems()
-        }
+    function getItemsById() {
+        return dataSet.filter(record => record.id === options.id);
     }
 
-    getItemsById() {
-        console.log("getItemsById")
+    function getItemsByAutoOption() {
+        return dataSet.filter(record => record.auto === options.auto);
     }
 
-    getItemsByAutoOption() {
-        console.log("")
+    function getItemsByMinPlayTime() {
+        return dataSet.filter(record => record.playTime >= options.minPlaytime);
     }
 
-    getItemsByMinPlayTime() {
-        console.log("getItemsByAutoOption")
-    }
-
-    mergeItems() {
+    function mergeItems() {
         console.log("mergeItems")
     }
 }
-
-const filteredItems = new Select(sample, {merge: true, minPlayTime: 4000});
-// I'd rather to prefer call this class Selection
-
-console.log(filteredItems);
 
