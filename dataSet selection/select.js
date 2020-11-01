@@ -52,50 +52,85 @@ const sample = [
     { "id": 116676275, "playTime": 5833,    "auto": false }
 ]
 
-const Select = (dataSet, options) => {
-    const keysSet = Object.keys(options);
-    let filterKey = 0;
-    let filteredData = [];
+const select = (dataSet, options) => {
+    if (!options) {
+        return dataSet;
+    }
 
-    getFilteredDataSet(dataSet, filterKey);
+    const optionsSet = Object.entries(options);
+    let optionKey = 0;
+    let filteredDataSet = [];
 
-    function getFilteredDataSet(filteredDataSet, filterKey) {
-        if (filter < keysSet.length) {
-            console.log("keys: ", keysSet[filterKey]);
+    return getFilteredDataSet(dataSet, optionKey);
 
-            if(keysSet[filterKey] === "id") {
-                filteredData = getItemsById();
+    function getFilteredDataSet(dataSet, optionKey) {
+        if (optionKey < optionsSet.length) {
+            if(optionsSet[optionKey][0] === "id") {
+                filteredDataSet = getItemsById(dataSet);
             }
-            if(keysSet[filterKey] === "auto") {
-                filteredData = getItemsByAutoOption()
+            if(optionsSet[optionKey][0] === "auto") {
+                filteredDataSet = getItemsByAutoOption(dataSet)
             }
-            if(keysSet[filterKey] === "minPlayTime"){
-                filteredData = getItemsByMinPlayTime()
+            if(optionsSet[optionKey][0] === "minPlayTime"){
+                filteredDataSet = getItemsByMinPlayTime(dataSet)
             }
-            if(keysSet[filterKey] === "merge"){
-                filteredData = mergeItems()
+            if(optionsSet[optionKey][0] === "merge" && optionsSet[optionKey][1] === true){
+                filteredDataSet = mergeItems(dataSet)
             }
 
-            console.log("filteredData: ", filteredData);
-            filterKey++;
-            getFilteredDataSet(filteredData, filterKey);
+            optionKey++;
+            return getFilteredDataSet(filteredDataSet, optionKey);
+        } else {
+            return filteredDataSet;
         }
     }
 
-    function getItemsById() {
+    function getItemsById(dataSet) {
         return dataSet.filter(record => record.id === options.id);
     }
 
-    function getItemsByAutoOption() {
+    function getItemsByAutoOption(dataSet) {
         return dataSet.filter(record => record.auto === options.auto);
     }
 
-    function getItemsByMinPlayTime() {
-        return dataSet.filter(record => record.playTime >= options.minPlaytime);
+    function getItemsByMinPlayTime(dataSet) {
+        return dataSet.filter(record => record.playTime >= options.minPlayTime);
     }
 
-    function mergeItems() {
-        console.log("mergeItems")
+    function mergeItems(dataSet) {
+        let mergedData = [];
+        let map = {};
+        let item;
+
+        dataSet.forEach(function(merged) {
+            item = map[merged.id];
+
+            if (item) {
+                item.playTime += merged.playTime;
+                item.auto = item.auto && merged.auto;
+            } else {
+                map[merged.id] = item = {
+                    id: merged.id,
+                    playTime: merged.playTime,
+                    auto: merged.auto
+                };
+                mergedData.push(item);
+            }
+        })
+
+        return mergedData;
     }
 }
+
+const example = [
+    { id: 8, playTime:  500, auto: false },
+    { id: 7, playTime: 1500, auto: true  },
+    { id: 1, playTime:  100, auto: true  },
+    { id: 7, playTime: 1000, auto: false },
+    { id: 7, playTime: 2000, auto: false },
+    { id: 2, playTime: 2000, auto: true  },
+    { id: 2, playTime: 2000, auto: true  }
+];
+
+console.log("Test: ", select(example, {merge: false, minPlayTime: 4000}))
 
