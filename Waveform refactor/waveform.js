@@ -23,6 +23,8 @@ SC.Waveform = (() => {
     update() {
       const data = this.sound.waveformData;
       const ctx = this.canvas.getContext('2d');
+      const width = this.canvas.width;
+      const height = this.canvas.height;
 
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -32,15 +34,12 @@ SC.Waveform = (() => {
         const value = Math.floor(
           this.canvas.height * data.samples[sampleInd] / data.height / 2
         );
-        const width = this.canvas.width;
-        const height = this.canvas.height;
+        ctx.fillStyle =
+            x < this.sound.currentTime / this.sound.duration * width
+                ? '#f60'
+                : '#333';
 
         for (let y = value; y < height - value; y++) {
-          ctx.fillStyle =
-            x < this.sound.currentTime / this.sound.duration * width
-              ? '#f60'
-              : '#333';
-
           ctx.fillRect(x, y, 1, 1);
         }
       }
