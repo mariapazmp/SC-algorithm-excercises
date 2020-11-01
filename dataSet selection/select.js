@@ -57,29 +57,30 @@ const select = (dataSet, options) => {
         return dataSet;
     }
 
-    const optionsSet = Object.entries(options);
-    let optionKey = 0;
+    const optionsKeys = Object.keys(options);
+    let optionIndex = 0;
     let filteredDataSet = [];
 
-    return getFilteredDataSet(dataSet, optionKey);
+    if(optionsKeys.find(option => option === 'merge' && options.merge === true)) {
+        dataSet = mergeItems(dataSet);
+    }
 
-    function getFilteredDataSet(dataSet, optionKey) {
-        if (optionKey < optionsSet.length) {
-            if(optionsSet[optionKey][0] === "id") {
+    return getFilteredDataSet(dataSet, optionIndex);
+
+    function getFilteredDataSet(dataSet, optionIndex) {
+        if (optionIndex < optionsKeys.length) {
+            if(optionsKeys[optionIndex] === "id") {
                 filteredDataSet = getItemsById(dataSet);
             }
-            if(optionsSet[optionKey][0] === "auto") {
+            if(optionsKeys[optionIndex] === "auto") {
                 filteredDataSet = getItemsByAutoOption(dataSet)
             }
-            if(optionsSet[optionKey][0] === "minPlayTime"){
+            if(optionsKeys[optionIndex] === "minPlayTime"){
                 filteredDataSet = getItemsByMinPlayTime(dataSet)
             }
-            if(optionsSet[optionKey][0] === "merge" && optionsSet[optionKey][1] === true){
-                filteredDataSet = mergeItems(dataSet)
-            }
 
-            optionKey++;
-            return getFilteredDataSet(filteredDataSet, optionKey);
+            optionIndex++;
+            return getFilteredDataSet(filteredDataSet, optionIndex);
         } else {
             return filteredDataSet;
         }
@@ -122,6 +123,7 @@ const select = (dataSet, options) => {
     }
 }
 
+// Tests:
 const example = [
     { id: 8, playTime:  500, auto: false },
     { id: 7, playTime: 1500, auto: true  },
@@ -130,7 +132,14 @@ const example = [
     { id: 7, playTime: 2000, auto: false },
     { id: 2, playTime: 2000, auto: true  },
     { id: 2, playTime: 2000, auto: true  }
-];
+]
 
-console.log("Test: ", select(example, {merge: false, minPlayTime: 4000}))
+console.log("Test 1: ", select(example, {merge: false, minPlayTime: 4000}));
+ /* Should return an empty array because merge=false */
+
+console.log("Test 2: ", select(sample));
+/* Should return original array */
+
+console.log("Test 3: ", select(sample, {minPlayTime: 4000, merge: true}));
+/* Should merge first and then apply the other filters */
 
